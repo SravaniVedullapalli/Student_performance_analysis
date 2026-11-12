@@ -1,274 +1,188 @@
-// Module 3: Marks and Attendance Analysis
-document.addEventListener("DOMContentLoaded", () => {
-    const subjectList = document.getElementById("subjectList");
-    const addSubjectBtn = document.getElementById("addSubjectBtn");
-    const calculateBtn = document.getElementById("calculateBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const attendanceInput = document.getElementById("attendanceInput");
-    const errorBanner = document.getElementById("errorBanner");
-    const resultsSection = document.getElementById("resultsSection");
+const studentForm = document.getElementById("studentForm");
+const studentTable = document.getElementById("studentTable");
+const searchInput = document.getElementById("searchInput");
+const studentModal = document.getElementById("studentModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
 
-    // Evaluation constants
-    const MIN_SUBJECT_PASS_MARK = 35;
-    const MIN_ATTENDANCE_PERCENT = 75;
-    const MIN_OVERALL_AVERAGE_PASS = 40;
+let students = JSON.parse(localStorage.getItem("students")) || [];
 
-    // Attach remove event listener to existing and future subject rows
-    subjectList.addEventListener("click", (e) => {
-        if (e.target.classList.contains("btn-remove")) {
-            const rows = subjectList.querySelectorAll(".subject-row");
-            if (rows.length <= 1) {
-                showError("You must have at least one subject.");
-                return;
-            }
-            e.target.closest(".subject-row").remove();
-            clearError();
-        }
-    });
+function saveStudents() {
+    localStorage.setItem("students", JSON.stringify(students));
+}
 
-    // Add new subject row
-    addSubjectBtn.addEventListener("click", () => {
-        const row = document.createElement("div");
-        row.className = "subject-row";
-        row.innerHTML = `
-            <input type="text" class="subject-name" placeholder="Subject Name" required>
-            <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-            <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-        `;
-        subjectList.appendChild(row);
-        row.querySelector(".subject-name").focus();
-    });
+function closeStudentModal() {
+    studentModal.classList.add("hidden");
+    studentModal.setAttribute("aria-hidden", "true");
+}
 
-    // Reset button
-    resetBtn.addEventListener("click", () => {
-        document.getElementById("studentName").value = "";
-        document.getElementById("rollNumber").value = "";
-        attendanceInput.value = "";
-        
-        // Reset subject list to standard 5
-        subjectList.innerHTML = `
-            <div class="subject-row">
-                <input type="text" class="subject-name" value="Mathematics" placeholder="Subject Name" required>
-                <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-            </div>
-            <div class="subject-row">
-                <input type="text" class="subject-name" value="Physics" placeholder="Subject Name" required>
-                <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-            </div>
-            <div class="subject-row">
-                <input type="text" class="subject-name" value="Chemistry" placeholder="Subject Name" required>
-                <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-            </div>
-            <div class="subject-row">
-                <input type="text" class="subject-name" value="Computer Science" placeholder="Subject Name" required>
-                <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-            </div>
-            <div class="subject-row">
-                <input type="text" class="subject-name" value="English" placeholder="Subject Name" required>
-                <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-            </div>
-        `;
-        clearError();
-        resultsSection.style.display = "none";
-    });
+function viewStudent(id) {
+    const student = students.find((item) => item.id === id);
 
-    // Calculate & Evaluate performance
-    calculateBtn.addEventListener("click", () => {
-        clearError();
+    if (!student) return;
 
-        const studentName = document.getElementById("studentName").value.trim();
-        const rollNumber = document.getElementById("rollNumber").value.trim();
+    document.getElementById("modalStudentId").textContent = student.id;
+    document.getElementById("modalStudentName").textContent = student.name;
+    document.getElementById("modalStudentEmail").textContent = student.email;
+    document.getElementById("modalStudentDepartment").textContent = student.department;
+    document.getElementById("modalStudentYear").textContent = student.year;
+    document.getElementById("modalStudentPhone").textContent = student.phone;
 
-        // 1. Validate attendance percentage
-        const attendanceValStr = attendanceInput.value.trim();
-        if (attendanceValStr === "") {
-            showError("Please enter the attendance percentage.");
-            attendanceInput.focus();
-            return;
-        }
+    studentModal.classList.remove("hidden");
+    studentModal.setAttribute("aria-hidden", "false");
+}
 
-        const attendance = parseFloat(attendanceValStr);
-        if (isNaN(attendance) || attendance < 0 || attendance > 100) {
-            showError("Attendance percentage must be a valid number between 0 and 100.");
-            attendanceInput.focus();
-            return;
-        }
+function displayStudents(data = students) {
+    studentTable.innerHTML = "";
 
-        // 2. Validate subjects & marks
-        const subjectRows = subjectList.querySelectorAll(".subject-row");
-        if (subjectRows.length === 0) {
-            showError("Please add at least one subject.");
-            return;
-        }
+    document.getElementById("noData").style.display = data.length === 0 ? "block" : "none";
 
-        const subjects = [];
-        let totalMarks = 0;
-        const failedSubjects = [];
+    data.forEach((student, index) => {
+        const row = document.createElement("tr");
 
-        for (let i = 0; i < subjectRows.length; i++) {
-            const row = subjectRows[i];
-            const nameInput = row.querySelector(".subject-name");
-            const markInput = row.querySelector(".subject-mark");
+        const values = [
+            index + 1,
+            student.id,
+            student.name,
+            student.email,
+            student.department,
+            student.year,
+            student.phone
+        ];
 
-            const name = nameInput.value.trim() || `Subject ${i + 1}`;
-            const markStr = markInput.value.trim();
-
-            if (markStr === "") {
-                showError(`Please enter marks for "${name}".`);
-                markInput.focus();
-                return;
-            }
-
-            const mark = parseFloat(markStr);
-            if (isNaN(mark) || mark < 0 || mark > 100) {
-                showError(`Marks for "${name}" must be between 0 and 100.`);
-                markInput.focus();
-                return;
-            }
-
-            const isSubjectPassed = mark >= MIN_SUBJECT_PASS_MARK;
-            if (!isSubjectPassed) {
-                failedSubjects.push({ name, mark });
-            }
-
-            totalMarks += mark;
-            subjects.push({ name, mark, isPassed: isSubjectPassed });
-        }
-
-        // 3. Calculate metrics
-        const subjectCount = subjects.length;
-        const maxTotalMarks = subjectCount * 100;
-        const averageMarks = totalMarks / subjectCount;
-
-        // 4. Pass / Fail Evaluation
-        const attendanceShortage = attendance < MIN_ATTENDANCE_PERCENT;
-        const averageFail = averageMarks < MIN_OVERALL_AVERAGE_PASS;
-        const isOverallPass = (failedSubjects.length === 0) && !attendanceShortage && !averageFail;
-
-        // Grade calculation
-        let grade = "F";
-        if (isOverallPass) {
-            if (averageMarks >= 85) grade = "A+ (Distinction)";
-            else if (averageMarks >= 70) grade = "A (First Class)";
-            else if (averageMarks >= 55) grade = "B (Second Class)";
-            else grade = "C (Pass Class)";
-        } else {
-            grade = "F (Fail)";
-        }
-
-        // 5. Render Results
-        displayResults({
-            studentName,
-            rollNumber,
-            subjects,
-            totalMarks,
-            maxTotalMarks,
-            averageMarks,
-            attendance,
-            isOverallPass,
-            failedSubjects,
-            attendanceShortage,
-            averageFail,
-            grade
-        });
-    });
-
-    function displayResults(data) {
-        // Display student info if provided
-        const studentDisplay = document.getElementById("studentDisplayName");
-        if (data.studentName || data.rollNumber) {
-            const parts = [];
-            if (data.studentName) parts.push(data.studentName);
-            if (data.rollNumber) parts.push(`(${data.rollNumber})`);
-            studentDisplay.textContent = parts.join(" ");
-        } else {
-            studentDisplay.textContent = "";
-        }
-
-        // Status banner
-        const statusBanner = document.getElementById("statusBanner");
-        const statusIcon = document.getElementById("statusIcon");
-        const statusTitle = document.getElementById("statusTitle");
-        const statusReason = document.getElementById("statusReason");
-
-        if (data.isOverallPass) {
-            statusBanner.className = "status-banner pass";
-            statusIcon.textContent = "✓";
-            statusTitle.textContent = "PASSED";
-            statusReason.textContent = "Congratulations! Met all academic marks and attendance requirements.";
-        } else {
-            statusBanner.className = "status-banner fail";
-            statusIcon.textContent = "✕";
-            statusTitle.textContent = "FAILED";
-
-            const reasons = [];
-            if (data.failedSubjects.length > 0) {
-                const subNames = data.failedSubjects.map(s => `${s.name} (${s.mark})`).join(", ");
-                reasons.push(`Scored below ${MIN_SUBJECT_PASS_MARK} in: ${subNames}`);
-            }
-            if (data.averageFail) {
-                reasons.push(`Overall average (${data.averageMarks.toFixed(1)}%) is below ${MIN_OVERALL_AVERAGE_PASS}%`);
-            }
-            if (data.attendanceShortage) {
-                reasons.push(`Attendance (${data.attendance.toFixed(1)}%) is below required ${MIN_ATTENDANCE_PERCENT}%`);
-            }
-            statusReason.textContent = reasons.join(" • ");
-        }
-
-        // Metric values
-        document.getElementById("totalMarksVal").textContent = `${data.totalMarks.toFixed(1).replace(/\.0$/, "")} / ${data.maxTotalMarks}`;
-        document.getElementById("averageMarksVal").textContent = `${data.averageMarks.toFixed(2)}%`;
-        document.getElementById("gradeVal").textContent = data.grade;
-
-        const attendanceVal = document.getElementById("attendanceVal");
-        attendanceVal.textContent = `${data.attendance.toFixed(1)}%`;
-        if (data.attendanceShortage) {
-            attendanceVal.style.color = "var(--danger)";
-        } else {
-            attendanceVal.style.color = "var(--success)";
-        }
-
-        // Table breakdown
-        const tbody = document.getElementById("breakdownTableBody");
-        tbody.innerHTML = "";
-        data.subjects.forEach(sub => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><strong>${escapeHtml(sub.name)}</strong></td>
-                <td>${sub.mark}</td>
-                <td>100</td>
-                <td>
-                    <span class="badge-tag ${sub.isPassed ? "badge-pass" : "badge-fail"}">
-                        ${sub.isPassed ? "PASS" : "FAIL"}
-                    </span>
-                </td>
-            `;
-            tbody.appendChild(tr);
+        values.forEach((value) => {
+            const td = document.createElement("td");
+            td.textContent = value;
+            row.appendChild(td);
         });
 
-        // Show section and scroll smoothly into view
-        resultsSection.style.display = "block";
-        resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        const actionCell = document.createElement("td");
+
+        const viewButton = document.createElement("button");
+        viewButton.textContent = "View";
+        viewButton.className = "view-btn";
+        viewButton.onclick = () => viewStudent(student.id);
+
+        const editButton = document.createElement("button");
+        editButton.textContent = "Edit";
+        editButton.className = "edit-btn";
+        editButton.onclick = () => editStudent(student.id);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete-btn";
+        deleteButton.onclick = () => deleteStudent(student.id);
+
+        actionCell.appendChild(viewButton);
+        actionCell.appendChild(editButton);
+        actionCell.appendChild(deleteButton);
+
+        row.appendChild(actionCell);
+        studentTable.appendChild(row);
+    });
+}
+
+studentForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const editId = document.getElementById("editId").value;
+    const student = {
+        id: document.getElementById("studentId").value.trim(),
+        name: document.getElementById("studentName").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        department: document.getElementById("department").value,
+        year: document.getElementById("year").value,
+        phone: document.getElementById("phone").value.trim()
+    };
+
+    if (!student.id || !student.name || !student.email || !student.department || !student.year || !student.phone) {
+        alert("Please fill in all student details.");
+        return;
     }
 
-    function showError(msg) {
-        errorBanner.textContent = msg;
-        errorBanner.style.display = "block";
+    const duplicate = students.some(
+        (item) => item.id.toLowerCase() === student.id.toLowerCase() && item.id !== editId
+    );
+
+    if (duplicate) {
+        alert("Student ID already exists!");
+        return;
     }
 
-    function clearError() {
-        errorBanner.textContent = "";
-        errorBanner.style.display = "none";
+    if (editId) {
+        const index = students.findIndex((item) => item.id === editId);
+        if (index !== -1) {
+            students[index] = student;
+            alert("Student updated successfully!");
+        }
+    } else {
+        students.push(student);
+        alert("Student added successfully!");
     }
 
-    function escapeHtml(str) {
-        const div = document.createElement("div");
-        div.textContent = str;
-        return div.innerHTML;
+    saveStudents();
+    displayStudents();
+    resetForm();
+});
+
+function editStudent(id) {
+    const student = students.find((item) => item.id === id);
+
+    if (!student) return;
+
+    document.getElementById("editId").value = student.id;
+    document.getElementById("studentId").value = student.id;
+    document.getElementById("studentName").value = student.name;
+    document.getElementById("email").value = student.email;
+    document.getElementById("department").value = student.department;
+    document.getElementById("year").value = student.year;
+    document.getElementById("phone").value = student.phone;
+
+    document.getElementById("formTitle").textContent = "Edit Student Details";
+    document.getElementById("submitBtn").textContent = "Update Student";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function deleteStudent(id) {
+    const confirmDelete = confirm("Are you sure you want to delete this student?");
+
+    if (!confirmDelete) return;
+
+    students = students.filter((item) => item.id !== id);
+    saveStudents();
+    displayStudents();
+
+    if (document.getElementById("editId").value === id) {
+        resetForm();
+    }
+
+    closeStudentModal();
+    alert("Student deleted successfully!");
+}
+
+searchInput.addEventListener("input", function () {
+    const searchValue = this.value.toLowerCase().trim();
+
+    const filteredStudents = students.filter((student) =>
+        student.name.toLowerCase().includes(searchValue) ||
+        student.id.toLowerCase().includes(searchValue)
+    );
+
+    displayStudents(filteredStudents);
+});
+
+function resetForm() {
+    studentForm.reset();
+    document.getElementById("editId").value = "";
+    document.getElementById("formTitle").textContent = "Add New Student";
+    document.getElementById("submitBtn").textContent = "Add Student";
+}
+
+closeModalBtn.addEventListener("click", closeStudentModal);
+studentModal.addEventListener("click", function (event) {
+    if (event.target === studentModal) {
+        closeStudentModal();
     }
 });
+
+displayStudents();
