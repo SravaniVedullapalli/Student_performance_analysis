@@ -1,14 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Performance Analysis</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Student Performance Analysis</h1>
-    <p>Welcome to our project!</p>
+    <header class="page-header">
+        <div class="header-content">
+            <div>
+                <h1>Student Performance Analysis</h1>
+                <p class="subtitle">Track toppers, low-performing students, subject-wise marks, attendance, and performance categories</p>
+            </div>
+            <div class="header-actions">
+                <button type="button" id="resetDataBtn" class="btn btn-secondary">Reset Sample Data</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Summary KPI Cards -->
+        <section class="kpi-grid" aria-label="Performance Summary">
+            <article class="kpi-card">
+                <span class="kpi-label">Total Students</span>
+                <strong class="kpi-value" id="totalStudents">0</strong>
+                <span class="kpi-meta" id="classAverageMeta">Class Avg: 0%</span>
+            </article>
+            <article class="kpi-card kpi-topper">
+                <span class="kpi-label">Class Topper</span>
+                <strong class="kpi-value" id="topperName">-</strong>
+                <span class="kpi-meta" id="topperScore">-</span>
+            </article>
+            <article class="kpi-card kpi-warning">
+                <span class="kpi-label">Low Performers (&lt; 50%)</span>
+                <strong class="kpi-value" id="lowPerformerCount">0</strong>
+                <span class="kpi-meta" id="atRiskMeta">Need academic attention</span>
+            </article>
+            <article class="kpi-card kpi-attendance">
+                <span class="kpi-label">Average Attendance</span>
+                <strong class="kpi-value" id="avgAttendance">0%</strong>
+                <span class="kpi-meta" id="lowAttendanceMeta">0 below 75%</span>
+            </article>
+        </section>
+
+        <!-- Category Distribution -->
+        <section class="panel" aria-label="Performance Categories">
+            <div class="panel-header">
+                <h2>Performance Category Breakdown</h2>
+                <span class="legend-note">Excellent (&ge;85%) &bull; Good (70–84%) &bull; Average (50–69%) &bull; Poor (&lt;50%)</span>
+            </div>
+            <div class="category-cards" id="categorySummary"></div>
+            <div class="stacked-bar" id="categoryBar" aria-label="Category distribution bar"></div>
+        </section>
+
+        <!-- Toppers and Low Performers -->
+        <section class="two-col-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Top Performers (Toppers)</h2>
+                    <span class="badge badge-excellent">Top 3 Overall</span>
+                </div>
+                <div id="toppersList" class="highlight-list"></div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Low-Performing Students</h2>
+                    <span class="badge badge-poor">Avg &lt; 50% or Subject &lt; 40</span>
+                </div>
+                <div id="lowPerformersList" class="highlight-list"></div>
+            </article>
+        </section>
+
+        <!-- Subject-wise Comparison & Attendance Analysis -->
+        <section class="two-col-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Subject-Wise Marks Comparison</h2>
+                    <span class="legend-note">Class Avg vs Highest vs Lowest</span>
+                </div>
+                <div id="subjectBars" class="subject-bars"></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Class Avg</th>
+                                <th>Highest (Topper)</th>
+                                <th>Lowest</th>
+                                <th>Pass Rate (&ge;40)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectTableBody"></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Attendance Analysis</h2>
+                    <span class="legend-note">Threshold: 75%</span>
+                </div>
+                <div id="attendanceInsights" class="attendance-insights"></div>
+                <div id="attendanceList" class="attendance-bars"></div>
+            </article>
+        </section>
+
+        <!-- Add New Student Form -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Add Student Record</h2>
+            </div>
+            <form id="studentForm" class="student-form">
+                <div class="form-grid">
+                    <label>
+                        Student Name
+                        <input type="text" id="studentName" required placeholder="e.g., Ananya Sharma">
+                    </label>
+                    <label>
+                        Roll No
+                        <input type="text" id="studentRoll" required placeholder="e.g., 111">
+                    </label>
+                    <label>
+                        Attendance (%)
+                        <input type="number" id="studentAttendance" min="0" max="100" required placeholder="0 - 100">
+                    </label>
+                    <label>
+                        Math
+                        <input type="number" id="markMath" min="0" max="100" required placeholder="0 - 100">
+                    </label>
+                    <label>
+                        Science
+                        <input type="number" id="markScience" min="0" max="100" required placeholder="0 - 100">
+                    </label>
+                    <label>
+                        English
+                        <input type="number" id="markEnglish" min="0" max="100" required placeholder="0 - 100">
+                    </label>
+                    <label>
+                        Computer
+                        <input type="number" id="markComputer" min="0" max="100" required placeholder="0 - 100">
+                    </label>
+                    <label>
+                        History
+                        <input type="number" id="markHistory" min="0" max="100" required placeholder="0 - 100">
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Student</button>
+            </form>
+        </section>
+
+        <!-- Full Student Records Table -->
+        <section class="panel">
+            <div class="panel-header table-controls">
+                <h2>All Students Performance</h2>
+                <div class="controls-row">
+                    <input type="search" id="searchInput" placeholder="Search by name or roll no..." aria-label="Search students">
+                    <select id="categoryFilter" aria-label="Filter by category">
+                        <option value="All">All Categories</option>
+                        <option value="Excellent">Excellent</option>
+                        <option value="Good">Good</option>
+                        <option value="Average">Average</option>
+                        <option value="Poor">Poor</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Math</th>
+                            <th>Science</th>
+                            <th>English</th>
+                            <th>Computer</th>
+                            <th>History</th>
+                            <th>Total / 500</th>
+                            <th>Average</th>
+                            <th>Attendance</th>
+                            <th>Category</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
     <script src="script.js"></script>
 </body>
 
