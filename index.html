@@ -89,6 +89,7 @@
             <!-- Action Buttons -->
             <div class="actions">
                 <button type="button" id="calculateBtn" class="btn btn-primary">Calculate & Evaluate</button>
+                <button type="button" id="saveToClassBtn" class="btn btn-secondary">Save to Class Analysis</button>
                 <button type="button" id="resetBtn" class="btn btn-outline">Reset Form</button>
             </div>
 
@@ -154,6 +155,136 @@
                 </div>
             </section>
         </main>
+
+        <!-- Class Performance Analysis Section -->
+        <section class="card analysis-card" aria-label="Class Performance Analysis">
+            <div class="analysis-top-header">
+                <div>
+                    <span class="badge">Performance Analysis</span>
+                    <h2>Class Performance Dashboard</h2>
+                    <p class="subtitle">Identify toppers, low-performing students, subject-wise marks, attendance trends, and performance categories.</p>
+                </div>
+                <button type="button" id="resetClassBtn" class="btn btn-outline btn-sm">Reset Sample Class</button>
+            </div>
+
+            <!-- KPI Summary -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Total Students</div>
+                    <div class="metric-value" id="classTotalStudents">0</div>
+                    <div class="metric-sub" id="classAvgSub">Class Avg: 0%</div>
+                </div>
+                <div class="metric-card metric-highlight-pass">
+                    <div class="metric-title">Class Topper</div>
+                    <div class="metric-value metric-value-sm" id="classTopperName">-</div>
+                    <div class="metric-sub" id="classTopperMeta">-</div>
+                </div>
+                <div class="metric-card metric-highlight-fail">
+                    <div class="metric-title">Low Performers</div>
+                    <div class="metric-value" id="classLowCount">0</div>
+                    <div class="metric-sub" id="classLowMeta">Avg &lt; 50% or subject &lt; 35</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Avg Attendance</div>
+                    <div class="metric-value" id="classAvgAttendance">0%</div>
+                    <div class="metric-sub" id="classLowAttMeta">0 below 75%</div>
+                </div>
+            </div>
+
+            <!-- Category Distribution -->
+            <div class="analysis-block">
+                <div class="section-header">
+                    <h3>Performance Categories</h3>
+                    <span class="section-hint no-margin">Excellent (&ge;85%) &bull; Good (70–84%) &bull; Average (50–69%) &bull; Poor (&lt;50%)</span>
+                </div>
+                <div class="category-grid" id="categoryBreakdownGrid"></div>
+                <div class="stacked-bar" id="categoryStackedBar"></div>
+            </div>
+
+            <!-- Toppers & Low Performers -->
+            <div class="two-col-analysis">
+                <div class="analysis-block">
+                    <div class="section-header">
+                        <h3>Toppers (Top 3)</h3>
+                        <span class="badge-tag badge-excellent">Top Performers</span>
+                    </div>
+                    <div id="toppersList" class="highlight-list"></div>
+                </div>
+                <div class="analysis-block">
+                    <div class="section-header">
+                        <h3>Low-Performing Students</h3>
+                        <span class="badge-tag badge-poor">Needs Attention</span>
+                    </div>
+                    <div id="lowPerformersList" class="highlight-list"></div>
+                </div>
+            </div>
+
+            <!-- Subject-wise Comparison & Attendance Analysis -->
+            <div class="two-col-analysis">
+                <div class="analysis-block">
+                    <div class="section-header">
+                        <h3>Subject-Wise Marks Comparison</h3>
+                    </div>
+                    <div id="subjectComparisonBars" class="bar-list"></div>
+                    <div class="table-container">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Class Avg</th>
+                                    <th>Highest</th>
+                                    <th>Lowest</th>
+                                    <th>Pass Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectComparisonBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="analysis-block">
+                    <div class="section-header">
+                        <h3>Attendance Analysis</h3>
+                    </div>
+                    <div id="attendanceInsightsGrid" class="insights-grid"></div>
+                    <div id="attendanceBarList" class="bar-list"></div>
+                </div>
+            </div>
+
+            <!-- Filterable All Students Table -->
+            <div class="analysis-block">
+                <div class="section-header table-toolbar">
+                    <h3>All Students Ranking &amp; Categories</h3>
+                    <div class="toolbar-controls">
+                        <input type="search" id="studentSearchInput" placeholder="Search name or roll..." aria-label="Search students">
+                        <select id="categoryFilterSelect" aria-label="Filter by category">
+                            <option value="All">All Categories</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Average">Average</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Roll No</th>
+                                <th>Student</th>
+                                <th>Average</th>
+                                <th>Attendance</th>
+                                <th>Weak Subjects</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classStudentsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script src="script.js"></script>
