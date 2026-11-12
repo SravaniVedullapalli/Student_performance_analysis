@@ -1,90 +1,77 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Performance Analysis - Module 3</title>
+    <title>Student Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <div class="container">
-        <header class="app-header">
-            <span class="badge">Module 3</span>
-            <h1>Marks & Attendance Analysis</h1>
-            <p class="subtitle">Enter subject-wise marks and attendance percentage to analyze performance and pass/fail status.</p>
+        <header>
+            <h1>Student Performance Analysis</h1>
+            <p>Module 2 - Student Management</p>
         </header>
 
-        <main class="card">
-            <!-- Student Information (Optional) -->
-            <section class="section">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="studentName">Student Name (Optional)</label>
-                        <input type="text" id="studentName" placeholder="e.g. Alex Johnson">
-                    </div>
-                    <div class="form-group">
-                        <label for="rollNumber">Roll / Student ID (Optional)</label>
-                        <input type="text" id="rollNumber" placeholder="e.g. CS2026-042">
-                    </div>
-                </div>
-            </section>
+        <section class="form-section">
+            <h2 id="formTitle">Add New Student</h2>
 
-            <!-- Marks Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2>Subject-Wise Marks (Out of 100)</h2>
-                    <button type="button" id="addSubjectBtn" class="btn btn-secondary btn-sm">+ Add Subject</button>
-                </div>
-                <p class="section-hint">Minimum passing mark per subject is <strong>35 / 100</strong>.</p>
+            <form id="studentForm">
+                <input type="hidden" id="editId">
 
-                <div id="subjectList" class="subject-list">
-                    <!-- Default Subjects -->
-                    <div class="subject-row">
-                        <input type="text" class="subject-name" value="Mathematics" placeholder="Subject Name" required>
-                        <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                        <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
+                <div class="form-grid">
+                    <div>
+                        <label>Student ID</label>
+                        <input type="text" id="studentId" placeholder="Enter Student ID" required>
                     </div>
-                    <div class="subject-row">
-                        <input type="text" class="subject-name" value="Physics" placeholder="Subject Name" required>
-                        <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                        <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-                    </div>
-                    <div class="subject-row">
-                        <input type="text" class="subject-name" value="Chemistry" placeholder="Subject Name" required>
-                        <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                        <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-                    </div>
-                    <div class="subject-row">
-                        <input type="text" class="subject-name" value="Computer Science" placeholder="Subject Name" required>
-                        <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                        <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-                    </div>
-                    <div class="subject-row">
-                        <input type="text" class="subject-name" value="English" placeholder="Subject Name" required>
-                        <input type="number" class="subject-mark" placeholder="Marks (0-100)" min="0" max="100" required>
-                        <button type="button" class="btn-remove" title="Remove Subject" aria-label="Remove subject">&times;</button>
-                    </div>
-                </div>
-            </section>
 
-            <!-- Attendance Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2>Attendance Percentage (%)</h2>
-                </div>
-                <p class="section-hint">Minimum required attendance is <strong>75%</strong>.</p>
-                <div class="form-group attendance-group">
-                    <div class="input-with-symbol">
-                        <input type="number" id="attendanceInput" placeholder="Enter attendance percentage" min="0" max="100" step="0.1" required>
-                        <span class="symbol">%</span>
+                    <div>
+                        <label>Student Name</label>
+                        <input type="text" id="studentName" placeholder="Enter Student Name" required>
+                    </div>
+
+                    <div>
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="Enter Email" required>
+                    </div>
+
+                    <div>
+                        <label>Department</label>
+                        <select id="department" required>
+                            <option value="">Select Department</option>
+                            <option value="CSE">CSE</option>
+                            <option value="ECE">ECE</option>
+                            <option value="EEE">EEE</option>
+                            <option value="IT">IT</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Year</label>
+                        <select id="year" required>
+                            <option value="">Select Year</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone" placeholder="Enter Phone Number" pattern="[0-9]{10}" maxlength="10" required>
                     </div>
                 </div>
-            </section>
 
-            <!-- Error Banner -->
-            <div id="errorBanner" class="alert alert-error" style="display: none;"></div>
+                <div class="buttons">
+                    <button type="submit" id="submitBtn">Add Student</button>
+                    <button type="button" id="cancelBtn" class="cancel" onclick="resetForm()">Clear</button>
+                </div>
+            </form>
+        </section>
 
             <!-- Action Buttons -->
             <div class="actions">
@@ -93,48 +80,27 @@
                 <button type="button" id="resetBtn" class="btn btn-outline">Reset Form</button>
             </div>
 
-            <!-- Results Section -->
-            <section id="resultsSection" class="results-section" style="display: none;">
-                <hr class="divider">
-                
-                <div class="results-header">
-                    <h2>Performance Evaluation Summary</h2>
-                    <span id="studentDisplayName" class="student-display"></span>
-                </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Year</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTable"></tbody>
+                </table>
+            </div>
 
-                <!-- Status Banner -->
-                <div id="statusBanner" class="status-banner">
-                    <div class="status-icon" id="statusIcon"></div>
-                    <div class="status-details">
-                        <div class="status-label">Overall Status</div>
-                        <div id="statusTitle" class="status-title">PASS</div>
-                        <div id="statusReason" class="status-reason"></div>
-                    </div>
-                </div>
-
-                <!-- Metrics Grid -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-title">Total Marks</div>
-                        <div class="metric-value" id="totalMarksVal">0 / 0</div>
-                        <div class="metric-sub" id="totalMarksSub">Max Possible Marks</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-title">Average Marks</div>
-                        <div class="metric-value" id="averageMarksVal">0%</div>
-                        <div class="metric-sub" id="averageMarksSub">Across all subjects</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-title">Grade</div>
-                        <div class="metric-value" id="gradeVal">-</div>
-                        <div class="metric-sub" id="gradeSub">Performance Band</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-title">Attendance</div>
-                        <div class="metric-value" id="attendanceVal">0%</div>
-                        <div class="metric-sub" id="attendanceSub">Min 75% required</div>
-                    </div>
-                </div>
+            <p id="noData">No student records found.</p>
+        </section>
+    </div>
 
                 <!-- Subject-wise Breakdown Table -->
                 <div class="table-container">
@@ -289,5 +255,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>
