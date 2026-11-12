@@ -1,14 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Performance Analysis</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Student Performance Analysis</h1>
-    <p>Welcome to our project!</p>
+    <main class="dashboard">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Module 1</p>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="range-badge">Academic Year 2025</div>
+        </header>
+
+        <section class="stats-grid">
+            <article class="stat-card accent-blue">
+                <span class="label">Total number of students</span>
+                <strong id="total-students">0</strong>
+                <small id="students-trend">+12 this term</small>
+            </article>
+
+            <article class="stat-card accent-green">
+                <span class="label">Average marks</span>
+                <strong id="average-marks">0%</strong>
+                <small>Across all students</small>
+            </article>
+
+            <article class="stat-card accent-gold">
+                <span class="label">Pass percentage</span>
+                <strong id="pass-percentage">0%</strong>
+                <small>Students above the pass mark</small>
+            </article>
+
+            <article class="stat-card accent-red">
+                <span class="label">Fail percentage</span>
+                <strong id="fail-percentage">0%</strong>
+                <small>Students below the pass mark</small>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Top-performing students</h2>
+                </div>
+                <ol id="top-students" class="top-students"></ol>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Performance overview</h2>
+                </div>
+                <div id="subject-chart" class="subject-chart"></div>
+            </article>
+        </section>
+
+        <section class="panel full-width">
+            <div class="panel-header">
+                <h2>Marks over time</h2>
+            </div>
+            <svg id="trend-chart" class="trend-chart" viewBox="0 0 680 220" preserveAspectRatio="none" aria-label="Student marks trend chart"></svg>
+            <div class="axis-labels">
+                <span>Term 1</span>
+                <span>Term 2</span>
+                <span>Term 3</span>
+                <span>Term 4</span>
+                <span>Final</span>
+            </div>
+        </section>
+    </main>
+
     <script src="script.js"></script>
 </body>
 
